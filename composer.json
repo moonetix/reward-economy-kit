@@ -1,0 +1,18 @@
+{
+    "name": "moonetix/reward-economy-kit",
+    "description": "Integer-only math for rewards currencies: payout to points, rounding, bonuses, reversals, cash-out and an inflation check.",
+    "type": "library",
+    "license": "MIT",
+    "homepage": "https://docs.moonetix.com/rewards",
+    "require": {
+        "php": ">=8.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "Moonetix\\RewardEconomy\\": "php/src/"
+        }
+    },
+    "scripts": {
+        "test": "php php/tests/run.php"
+    }
+}

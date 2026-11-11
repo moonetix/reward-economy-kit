@@ -1,0 +1,211 @@
+{
+  "description": "Shared test vectors for reward-economy-kit. Amounts are decimal strings: USD in micro-units (1 USD = 1000000), points in integer units of the currency. Both the JavaScript and the PHP suites run every case.",
+  "version": 1,
+  "parseUsd": [
+    { "in": "0.333", "out": "333000" },
+    { "in": "12", "out": "12000000" },
+    { "in": "0.000001", "out": "1" },
+    { "in": "0", "out": "0" },
+    { "in": "007.50", "out": "7500000" },
+    { "in": "9223372036854.775807", "out": "9223372036854775807" },
+    { "in": "9223372036854.775808", "throws": true },
+    { "in": "1.0000001", "throws": true },
+    { "in": "-1", "throws": true },
+    { "in": "1e3", "throws": true },
+    { "in": "", "throws": true },
+    { "in": " 1", "throws": true },
+    { "in": "1,5", "throws": true },
+    { "in": ".5", "throws": true }
+  ],
+  "formatUsd": [
+    { "in": "333000", "out": "0.333" },
+    { "in": "12000000", "out": "12" },
+    { "in": "1", "out": "0.000001" },
+    { "in": "0", "out": "0" },
+    { "in": "-2500000", "out": "-2.5" }
+  ],
+  "parseUnits": [
+    { "in": "0.375", "decimals": 3, "out": "375" },
+    { "in": "17", "decimals": 0, "out": "17" },
+    { "in": "2.5", "decimals": 3, "out": "2500" },
+    { "in": "0.5", "decimals": 0, "throws": true },
+    { "in": "1.2", "decimals": 7, "throws": true }
+  ],
+  "formatUnits": [
+    { "in": "375", "decimals": 3, "out": "0.375" },
+    { "in": "-1250", "decimals": 3, "out": "-1.25" },
+    { "in": "17", "decimals": 0, "out": "17" },
+    { "in": "2000", "decimals": 3, "out": "2" }
+  ],
+  "divRound": [
+    { "n": "7", "d": "2", "mode": "floor", "out": "3" },
+    { "n": "7", "d": "2", "mode": "ceil", "out": "4" },
+    { "n": "7", "d": "2", "mode": "half-up", "out": "4" },
+    { "n": "7", "d": "2", "mode": "half-even", "out": "4" },
+    { "n": "5", "d": "2", "mode": "floor", "out": "2" },
+    { "n": "5", "d": "2", "mode": "ceil", "out": "3" },
+    { "n": "5", "d": "2", "mode": "half-up", "out": "3" },
+    { "n": "5", "d": "2", "mode": "half-even", "out": "2" },
+    { "n": "9", "d": "4", "mode": "half-up", "out": "2" },
+    { "n": "9", "d": "4", "mode": "ceil", "out": "3" },
+    { "n": "11", "d": "4", "mode": "half-up", "out": "3" },
+    { "n": "11", "d": "4", "mode": "half-even", "out": "3" },
+    { "n": "11", "d": "4", "mode": "floor", "out": "2" },
+    { "n": "8", "d": "4", "mode": "ceil", "out": "2" },
+    { "n": "0", "d": "5", "mode": "ceil", "out": "0" },
+    { "n": "123456789012345678901234567890", "d": "1000000007", "mode": "floor", "out": "123456788148148161864" },
+    { "n": "123456789012345678901234567890", "d": "1000000007", "mode": "ceil", "out": "123456788148148161865" },
+    { "n": "123456789012345678901234567890", "d": "1000000007", "mode": "half-up", "out": "123456788148148161864" },
+    { "n": "1", "d": "0", "mode": "floor", "throws": true },
+    { "n": "1", "d": "2", "mode": "round", "throws": true }
+  ],
+  "defineCurrency": [
+    {
+      "config": { "rate": "1000", "userShareBps": 5000 },
+      "out": { "rate": "1000", "rateMicros": "1000000000", "userShareBps": 5000, "decimals": 0, "rounding": "floor", "redemptionRate": "1000", "redemptionRateMicros": "1000000000" }
+    },
+    {
+      "config": { "rate": "0.5", "userShareBps": 10000, "decimals": 2, "rounding": "half-even", "redemptionRate": "1100.000000" },
+      "out": { "rate": "0.5", "rateMicros": "500000", "userShareBps": 10000, "decimals": 2, "rounding": "half-even", "redemptionRate": "1100", "redemptionRateMicros": "1100000000" }
+    },
+    {
+      "config": { "rate": 250, "userShareBps": 1 },
+      "out": { "rate": "250", "rateMicros": "250000000", "userShareBps": 1, "decimals": 0, "rounding": "floor", "redemptionRate": "250", "redemptionRateMicros": "250000000" }
+    },
+    { "config": { "rate": "1000", "userShareBps": 0 }, "throws": true },
+    { "config": { "rate": "1000", "userShareBps": 10001 }, "throws": true },
+    { "config": { "rate": "1000", "userShareBps": 5000, "decimals": 7 }, "throws": true },
+    { "config": { "rate": "1000", "userShareBps": 5000, "rounding": "round" }, "throws": true },
+    { "config": { "rate": "0", "userShareBps": 5000 }, "throws": true },
+    { "config": { "rate": "-1", "userShareBps": 5000 }, "throws": true },
+    { "config": { "rate": "1.0000001", "userShareBps": 5000 }, "throws": true },
+    { "config": { "rate": 1.5, "userShareBps": 5000 }, "throws": true },
+    { "config": { "rate": "1000", "userShareBps": 50.5 }, "throws": true },
+    { "config": { "rate": "1000", "userShareBps": 5000, "redemptionRate": "0" }, "throws": true }
+  ],
+  "pointsForPayout": [
+    { "name": "basic", "currency": { "rate": "1000", "userShareBps": 5000 }, "payout": "500000", "out": "250" },
+    { "name": "10% bonus", "currency": { "rate": "1000", "userShareBps": 5000 }, "payout": "500000", "bonusBps": 1000, "out": "275" },
+    { "name": "floor drops the fraction", "currency": { "rate": "100", "userShareBps": 5000 }, "payout": "333000", "out": "16" },
+    { "name": "half-up", "currency": { "rate": "100", "userShareBps": 5000, "rounding": "half-up" }, "payout": "333000", "out": "17" },
+    { "name": "ceil", "currency": { "rate": "100", "userShareBps": 5000, "rounding": "ceil" }, "payout": "333000", "out": "17" },
+    { "name": "half-even above half", "currency": { "rate": "100", "userShareBps": 5000, "rounding": "half-even" }, "payout": "333000", "out": "17" },
+    { "name": "exact half, floor", "currency": { "rate": "1000", "userShareBps": 5000 }, "payout": "1000", "out": "0" },
+    { "name": "exact half, half-up", "currency": { "rate": "1000", "userShareBps": 5000, "rounding": "half-up" }, "payout": "1000", "out": "1" },
+    { "name": "exact half, half-even to 0", "currency": { "rate": "1000", "userShareBps": 5000, "rounding": "half-even" }, "payout": "1000", "out": "0" },
+    { "name": "exact half, half-even to 2", "currency": { "rate": "1000", "userShareBps": 5000, "rounding": "half-even" }, "payout": "3000", "out": "2" },
+    { "name": "3 decimals", "currency": { "rate": "1", "userShareBps": 5000, "decimals": 3 }, "payout": "750000", "out": "375" },
+    { "name": "zero payout", "currency": { "rate": "1000", "userShareBps": 5000 }, "payout": "0", "out": "0" },
+    { "name": "smallest unit", "currency": { "rate": "1", "userShareBps": 10000, "decimals": 6 }, "payout": "1", "out": "1" },
+    { "name": "fractional rate, floor", "currency": { "rate": "0.5", "userShareBps": 10000 }, "payout": "3000000", "out": "1" },
+    { "name": "fractional rate, half-up", "currency": { "rate": "0.5", "userShareBps": 10000, "rounding": "half-up" }, "payout": "3000000", "out": "2" },
+    { "name": "500% bonus", "currency": { "rate": "100", "userShareBps": 5000 }, "payout": "1000000", "bonusBps": 50000, "out": "300" },
+    { "name": "62.5% share", "currency": { "rate": "1000", "userShareBps": 6250 }, "payout": "1200000", "out": "750" },
+    { "name": "large payout, product beyond 64 bits", "currency": { "rate": "1000", "userShareBps": 10000 }, "payout": "9223372036854", "out": "9223372036" },
+    { "name": "result exactly MAX_AMOUNT", "currency": { "rate": "1000000", "userShareBps": 10000 }, "payout": "9223372036854775807", "out": "9223372036854775807" },
+    { "name": "result beyond MAX_AMOUNT", "currency": { "rate": "2000000", "userShareBps": 10000 }, "payout": "9223372036854775807", "throws": true },
+    { "name": "bonus out of range", "currency": { "rate": "1000", "userShareBps": 5000 }, "payout": "500000", "bonusBps": 1000001, "throws": true },
+    { "name": "negative payout", "currency": { "rate": "1000", "userShareBps": 5000 }, "payout": "-1", "throws": true }
+  ],
+  "pointsToUsd": [
+    { "currency": { "rate": "1000", "userShareBps": 5000 }, "units": "1000", "out": "1000000" },
+    { "currency": { "rate": "1000", "userShareBps": 5000 }, "units": "1", "out": "1000" },
+    { "currency": { "rate": "1", "userShareBps": 5000, "decimals": 3 }, "units": "375", "out": "375000" },
+    { "currency": { "rate": "3", "userShareBps": 10000 }, "units": "1", "out": "333333" },
+    { "currency": { "rate": "3", "userShareBps": 10000 }, "units": "1", "rounding": "ceil", "out": "333334" },
+    { "currency": { "rate": "3", "userShareBps": 10000 }, "units": "2", "rounding": "half-up", "out": "666667" },
+    { "currency": { "rate": "1000", "userShareBps": 5000, "redemptionRate": "1250" }, "units": "5000", "out": "4000000" }
+  ],
+  "usdToPoints": [
+    { "currency": { "rate": "1000", "userShareBps": 5000 }, "micros": "5000000", "out": "5000" },
+    { "currency": { "rate": "3", "userShareBps": 10000 }, "micros": "1000000", "out": "3" },
+    { "currency": { "rate": "3", "userShareBps": 10000 }, "micros": "333334", "out": "2" },
+    { "currency": { "rate": "3", "userShareBps": 10000 }, "micros": "333334", "rounding": "floor", "out": "1" },
+    { "currency": { "rate": "1000", "userShareBps": 5000, "decimals": 3 }, "micros": "1", "out": "1" }
+  ],
+  "giftCardCost": [
+    { "currency": { "rate": "1000", "userShareBps": 5000 }, "face": "5000000", "out": "5000" },
+    { "currency": { "rate": "1000", "userShareBps": 5000 }, "face": "5000000", "feeBps": 300, "out": "5150" },
+    { "currency": { "rate": "1000", "userShareBps": 5000 }, "face": "5000000", "feeMicros": "250000", "out": "5250" },
+    { "currency": { "rate": "1000", "userShareBps": 5000 }, "face": "5000000", "feeBps": 300, "feeMicros": "250000", "out": "5400" },
+    { "currency": { "rate": "1000", "userShareBps": 5000 }, "face": "1990000", "feeBps": 150, "out": "2020" },
+    { "currency": { "rate": "1000", "userShareBps": 5000, "redemptionRate": "1100" }, "face": "5000000", "out": "5500" },
+    { "currency": { "rate": "3", "userShareBps": 10000 }, "face": "10000000", "out": "30" },
+    { "currency": { "rate": "1", "userShareBps": 5000, "decimals": 3 }, "face": "5000000", "out": "5000" }
+  ],
+  "checkCashout": [
+    { "balance": "5000", "cost": "5000", "minimum": "5000", "out": { "ok": true, "reason": "ok", "shortfall": "0" } },
+    { "balance": "4999", "cost": "5000", "minimum": "5000", "out": { "ok": false, "reason": "insufficient_balance", "shortfall": "1" } },
+    { "balance": "9000", "cost": "1000", "minimum": "5000", "out": { "ok": false, "reason": "below_minimum", "shortfall": "0" } },
+    { "balance": "9000", "cost": "0", "out": { "ok": false, "reason": "below_minimum", "shortfall": "0" } },
+    { "balance": "-200", "cost": "5000", "out": { "ok": false, "reason": "insufficient_balance", "shortfall": "5200" } }
+  ],
+  "activeBonusBps": [
+    { "name": "before a one-off window", "windows": [{ "bonusBps": 1000, "start": 1767225600, "end": 1767232800 }], "at": 1767225599, "out": 0 },
+    { "name": "start is inclusive", "windows": [{ "bonusBps": 1000, "start": 1767225600, "end": 1767232800 }], "at": 1767225600, "out": 1000 },
+    { "name": "last second", "windows": [{ "bonusBps": 1000, "start": 1767225600, "end": 1767232800 }], "at": 1767232799, "out": 1000 },
+    { "name": "end is exclusive", "windows": [{ "bonusBps": 1000, "start": 1767225600, "end": 1767232800 }], "at": 1767232800, "out": 0 },
+    { "name": "daily, day 10", "windows": [{ "bonusBps": 2000, "start": 1767276000, "end": 1767283200, "repeat": "daily" }], "at": 1768143600, "out": 2000 },
+    { "name": "daily, end of day 3", "windows": [{ "bonusBps": 2000, "start": 1767276000, "end": 1767283200, "repeat": "daily" }], "at": 1767542400, "out": 0 },
+    { "name": "daily, before the first window", "windows": [{ "bonusBps": 2000, "start": 1767276000, "end": 1767283200, "repeat": "daily" }], "at": 1767189600, "out": 0 },
+    { "name": "weekly, next week", "windows": [{ "bonusBps": 500, "start": 1767225600, "end": 1767312000, "repeat": "weekly" }], "at": 1767830500, "out": 500 },
+    { "name": "weekly, day after", "windows": [{ "bonusBps": 500, "start": 1767225600, "end": 1767312000, "repeat": "weekly" }], "at": 1767916800, "out": 0 },
+    { "name": "highest wins, no stacking", "windows": [{ "bonusBps": 1000, "start": 1767225600, "end": 1767232800 }, { "bonusBps": 1500, "start": null, "end": null }], "at": 1767225600, "out": 1500 },
+    { "name": "open start", "windows": [{ "bonusBps": 300, "start": null, "end": 1767225600 }], "at": 0, "out": 300 },
+    { "name": "no windows", "windows": [], "at": 1767225600, "out": 0 },
+    { "name": "daily window as long as a day", "windows": [{ "bonusBps": 2000, "start": 1767225600, "end": 1767312000, "repeat": "daily" }], "at": 1767225600, "throws": true },
+    { "name": "repeat without end", "windows": [{ "bonusBps": 2000, "start": 1767225600, "end": null, "repeat": "weekly" }], "at": 1767225600, "throws": true },
+    { "name": "end before start", "windows": [{ "bonusBps": 2000, "start": 1767225600, "end": 1767225600 }], "at": 1767225600, "throws": true },
+    { "name": "unknown repeat", "windows": [{ "bonusBps": 2000, "start": 1767225600, "end": 1767232800, "repeat": "monthly" }], "at": 1767225600, "throws": true }
+  ],
+  "reversalAmount": [
+    { "credited": "250", "out": "250" },
+    { "credited": "250", "alreadyReversed": "100", "out": "150" },
+    { "credited": "250", "requested": "500", "out": "250" },
+    { "credited": "250", "requested": "50", "out": "50" },
+    { "credited": "250", "alreadyReversed": "250", "out": "0" },
+    { "credited": "250", "alreadyReversed": "200", "requested": "999", "out": "50" },
+    { "credited": "250", "alreadyReversed": "300", "throws": true },
+    { "credited": "250", "requested": "-1", "throws": true }
+  ],
+  "applyReversal": [
+    { "balance": "1000", "credited": "250", "out": { "reversed": "250", "newBalance": "750", "uncollected": "0" } },
+    { "balance": "100", "credited": "250", "out": { "reversed": "250", "newBalance": "-150", "uncollected": "0" } },
+    { "balance": "100", "credited": "250", "allowNegativeBalance": false, "out": { "reversed": "250", "newBalance": "0", "uncollected": "150" } },
+    { "balance": "-50", "credited": "250", "allowNegativeBalance": false, "out": { "reversed": "250", "newBalance": "-50", "uncollected": "250" } },
+    { "balance": "1000", "credited": "250", "alreadyReversed": "200", "requested": "999", "out": { "reversed": "50", "newBalance": "950", "uncollected": "0" } },
+    { "balance": "1000", "credited": "250", "alreadyReversed": "250", "out": { "reversed": "0", "newBalance": "1000", "uncollected": "0" } },
+    { "balance": "-9223372036854775800", "credited": "250", "throws": true }
+  ],
+  "inflationCheck": [
+    { "name": "face value at the mint rate", "currency": { "rate": "1000", "userShareBps": 5000 }, "out": { "revenuePer1000PointsMicros": "2000000", "valuePer1000PointsMicros": "1000000", "effectiveUserShareBps": "5000", "exceedsRevenue": false } },
+    { "name": "100% bonus pays out everything", "currency": { "rate": "1000", "userShareBps": 5000 }, "bonusBps": 10000, "out": { "revenuePer1000PointsMicros": "1000000", "valuePer1000PointsMicros": "1000000", "effectiveUserShareBps": "10000", "exceedsRevenue": false } },
+    { "name": "150% bonus pays out more than you earn", "currency": { "rate": "1000", "userShareBps": 5000 }, "bonusBps": 15000, "out": { "revenuePer1000PointsMicros": "800000", "valuePer1000PointsMicros": "1000000", "effectiveUserShareBps": "12500", "exceedsRevenue": true } },
+    { "name": "gift card priced above face", "currency": { "rate": "1000", "userShareBps": 5000 }, "giftCard": { "faceMicros": "5000000", "cost": "5500" }, "out": { "revenuePer1000PointsMicros": "2000000", "valuePer1000PointsMicros": "909091", "effectiveUserShareBps": "4545", "exceedsRevenue": false } },
+    { "name": "cheap redemption rate", "currency": { "rate": "100", "userShareBps": 9000, "redemptionRate": "80" }, "out": { "revenuePer1000PointsMicros": "11111111", "valuePer1000PointsMicros": "12500000", "effectiveUserShareBps": "11250", "exceedsRevenue": true } },
+    { "name": "dollar currency with 3 decimals", "currency": { "rate": "1", "userShareBps": 5000, "decimals": 3 }, "out": { "revenuePer1000PointsMicros": "2000000000", "valuePer1000PointsMicros": "1000000000", "effectiveUserShareBps": "5000", "exceedsRevenue": false } },
+    { "name": "gift card with 3 decimals", "currency": { "rate": "1", "userShareBps": 5000, "decimals": 3 }, "giftCard": { "faceMicros": "10000000", "cost": "10000" }, "out": { "revenuePer1000PointsMicros": "2000000000", "valuePer1000PointsMicros": "1000000000", "effectiveUserShareBps": "5000", "exceedsRevenue": false } }
+  ],
+  "moonetixCurrency": [
+    { "name": "docs table row 1", "preset": { "rate": "1000", "splitPercent": 50, "rounding": "whole" }, "payout": "0.50", "out": "250", "text": "250" },
+    { "name": "docs table row 2, 10% bonus", "preset": { "rate": "1000", "splitPercent": 50, "rounding": "whole" }, "payout": "0.50", "bonusPercent": "10", "out": "275", "text": "275" },
+    { "name": "docs table row 3, 16.65 rounds to 17", "preset": { "rate": "100", "splitPercent": 50, "rounding": "whole" }, "payout": "0.333", "out": "17", "text": "17" },
+    { "name": "docs table row 4, dollars with 3 decimals", "preset": { "rate": "1", "splitPercent": 50, "rounding": "three-decimals" }, "payout": "0.75", "out": "375", "text": "0.375" },
+    { "name": "docs rounding, 0.0084 becomes 0.008", "preset": { "rate": "1", "splitPercent": 50, "rounding": "three-decimals" }, "payout": "0.0168", "out": "8", "text": "0.008" },
+    { "name": "docs rounding, halves round up: 2.5 becomes 3", "preset": { "rate": "1000", "splitPercent": 50, "rounding": "whole" }, "payout": "0.005", "out": "3", "text": "3" },
+    { "name": "docs rounding, a reward of 0 after rounding", "preset": { "rate": "1000", "splitPercent": 50, "rounding": "whole" }, "payout": "0.0009", "out": "0", "text": "0" },
+    { "name": "split 0 is not allowed", "preset": { "rate": "1000", "splitPercent": 0, "rounding": "whole" }, "payout": "0.50", "throws": true },
+    { "name": "split above 100 is not allowed", "preset": { "rate": "1000", "splitPercent": 101, "rounding": "whole" }, "payout": "0.50", "throws": true },
+    { "name": "only the two documented rounding options", "preset": { "rate": "1000", "splitPercent": 50, "rounding": "floor" }, "payout": "0.50", "throws": true }
+  ],
+  "moonetixBonusBps": [
+    { "in": "10", "out": 1000 },
+    { "in": 10, "out": 1000 },
+    { "in": "12.5", "out": 1250 },
+    { "in": "500", "out": 50000 },
+    { "in": "0", "out": 0 },
+    { "in": "500.01", "throws": true },
+    { "in": "1.234", "throws": true },
+    { "in": "-5", "throws": true }
+  ]
+}

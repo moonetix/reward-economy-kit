@@ -1,0 +1,40 @@
+{
+  "name": "reward-economy-kit",
+  "version": "1.0.0",
+  "description": "Integer-only math for rewards currencies: payout to points, rounding, bonuses, reversals, cash-out and an inflation check.",
+  "type": "module",
+  "main": "./src/index.js",
+  "types": "./src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "default": "./src/index.js"
+    }
+  },
+  "files": [
+    "src/",
+    "test-vectors/vectors.json"
+  ],
+  "scripts": {
+    "test": "node --test",
+    "test:php": "php php/tests/run.php"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "keywords": [
+    "rewards",
+    "virtual-currency",
+    "offerwall",
+    "points",
+    "bigint",
+    "money"
+  ],
+  "homepage": "https://docs.moonetix.com/rewards",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/moonetix/reward-economy-kit.git"
+  },
+  "license": "MIT",
+  "author": "Moonetix (https://moonetix.com)"
+}
