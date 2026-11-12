@@ -128,7 +128,7 @@ php php/tests/run.php    # shared vectors + PHP-specific checks
 
 ## About Moonetix
 
-Moonetix is a pay-per-result affiliate network. Publishers add its offerwall to an app, game, website, bot or community, and users earn the publisher's own currency by completing offers. Publisher accounts: [moonetix.com/register](https://moonetix.com/register).
+Moonetix is an affiliate network. Publishers add its offerwall to an app, game, website, bot or community, and users earn the publisher's own currency by completing offers. Publisher accounts: [moonetix.com/register](https://moonetix.com/register).
 
 Other open source from Moonetix: [awesome-offerwalls](https://github.com/moonetix/awesome-offerwalls), [awesome-app-monetization](https://github.com/moonetix/awesome-app-monetization), [offerwall-postback-handlers](https://github.com/moonetix/offerwall-postback-handlers), [offerwall-nextjs-starter](https://github.com/moonetix/offerwall-nextjs-starter), [telegram-mini-app-offerwall](https://github.com/moonetix/telegram-mini-app-offerwall), [discord-rewards-bot](https://github.com/moonetix/discord-rewards-bot), [moonetix-offerwall-wordpress](https://github.com/moonetix/moonetix-offerwall-wordpress), [offerwall-laravel](https://github.com/moonetix/offerwall-laravel), [offerwall-express](https://github.com/moonetix/offerwall-express).
 
