@@ -102,7 +102,7 @@ function row(k, v, cls = '') {
   return `<div class="${cls}"><dt>${k}</dt><dd>${v}</dd></div>`;
 }
 
-function compute() {
+function compute(heroName) {
   const v = read();
   const calls = [];
   const call = (text, fn) => {
@@ -153,7 +153,12 @@ function compute() {
     const p = pointsForPayout(payout, { ...config, rounding: m }, { bonusBps });
     return `<li class="${m === currency.rounding ? 'on' : ''}"><span>${m}</span><b>${pts(p)}</b></li>`;
   }).join('');
-  const fine = call(`pointsForPayout(${show(payout)}, { ...config, decimals: 6, rounding: "floor" }, { bonusBps: ${bonusBps} })`, () => pointsForPayout(payout, { ...config, decimals: 6, rounding: 'floor' }, { bonusBps }));
+  let fine = null;
+  try {
+    fine = call(`pointsForPayout(${show(payout)}, { ...config, decimals: 6, rounding: "floor" }, { bonusBps: ${bonusBps} })`, () => pointsForPayout(payout, { ...config, decimals: 6, rounding: 'floor' }, { bonusBps }));
+  } catch {
+    fine = null;
+  }
   const value = call(`pointsToUsd(${show(credited)}, currency)`, () => pointsToUsd(credited, currency));
   let over = false;
   let split = '<p class="small muted">A payout of $0.00 leaves nothing to split.</p>';
@@ -170,22 +175,27 @@ function compute() {
       </ul>`;
   }
   $('receipt-tag').innerHTML = over ? '<span class="tag bad">exceeds revenue</span>' : '';
-  $('receipt').innerHTML = `
+  const receipt = `
     <p class="big total"><b>${pts(credited)}</b> <span>${word(credited)} credited</span></p>
     <p class="worth">Worth <b>${usd(value)}</b> at cash-out.</p>
-    <dl class="facts slip">
+    <dl class="kv slip">
       ${row('Offer payout', usd(payout))}
       ${row('User share', `${formatUnits(currency.userShareBps, 2)}%`)}
       ${row('Bonus', esc(bonusText))}
     </dl>
     <h4>Split of this ${usd(payout)} payout</h4>
     ${split}`;
-  for (const el of $('receipt').querySelectorAll('[data-w]')) el.style.width = `${el.dataset.w}%`;
+  $('receipt').innerHTML = receipt;
+  if (heroName) {
+    $('hero-name').textContent = heroName;
+    $('hero-preview').innerHTML = receipt;
+  }
+  for (const el of document.querySelectorAll('.split [data-w]')) el.style.width = `${el.dataset.w}%`;
 
   $('credit').innerHTML = `
-    <dl class="facts">
+    <dl class="kv">
       ${row('Formula', `${esc(v.payout)} x ${esc(currency.rate)} x ${formatUnits(currency.userShareBps, 2)}% x ${formatUnits(10000 + bonusBps, 2)}%`)}
-      ${row('Before rounding (6 decimals)', `<span class="mono">${group(formatUnits(fine, 6))}</span>`)}
+      ${row('Before rounding (6 decimals)', fine === null ? 'Too large to show' : `<span class="mono">${group(formatUnits(fine, 6))}</span>`)}
       ${row(`Credited, ${esc(currency.rounding)}`, `<b>${pts(credited)}</b> ${word(credited)}`)}
     </dl>
     <p class="small muted">The same credit in each rounding mode:</p>
@@ -198,7 +208,7 @@ function compute() {
     const args = { balance, credited, allowNegativeBalance: v.negative };
     const r = call(`applyReversal(${show(args)})`, () => applyReversal(args));
     $('rev').innerHTML = `
-      <dl class="facts">
+      <dl class="kv">
         ${row('Taken back', `<b>${pts(r.reversed)}</b> ${word(r.reversed)}, exactly what was credited`)}
         ${row('Balance', `${pts(balance)} to <b class="${r.newBalance < 0n ? 'neg' : ''}">${pts(r.newBalance)}</b>`)}
         ${row('Uncollected', `${pts(r.uncollected)}${r.uncollected > 0n ? ' <span class="tag warn">loss to record</span>' : ''}`)}
@@ -225,7 +235,7 @@ function compute() {
       : `<span class="tag warn">${c.reason === 'below_minimum' ? 'below the minimum' : `needs ${pts(c.shortfall)} more`}</span>`;
     $('cash').innerHTML = `
       <p class="big"><b>${pts(cost)}</b> <span>${word(cost)} for a ${usd(face)} reward</span></p>
-      <dl class="facts">
+      <dl class="kv">
         ${row('Minimum cash-out', `${pts(minimum)} ${word(minimum)} (${usd(minUsd)})`)}
         ${row('Balance after this offer', `${pts(before)} + ${pts(credited)} = ${pts(balance)}`)}
         ${row('Check', verdict)}
@@ -257,18 +267,26 @@ function compute() {
 function renderWhy(v, fine, bonusBps) {
   const demo = pointsForPayout(parseUsd('0.29'), { rate: '100', userShareBps: 10000 });
   const float = 0.29 * 100;
-  let mine = '';
-  if (fine !== null) {
-    const f = parseFloat(v.payout) * parseFloat(v.rate) * (parseFloat(v.share) / 100) * (1 + bonusBps / 10000);
-    mine = `<p class="small">Your inputs as one floating point expression: <code>${esc(String(f))}</code>. Exact, from the library: <code>${group(formatUnits(fine, 6))}</code>.</p>`;
+  const short = Number(demo) - Math.floor(float);
+  $('why-float-tag').innerHTML = short > 0 ? `<span class="tag bad">${short} point${short === 1 ? '' : 's'} short</span>` : '';
+  $('why-int-tag').innerHTML = '<span class="tag good">exact</span>';
+  $('why-float').innerHTML = `
+    <p class="cmp-v">${float}</p>
+    <p class="cmp-code"><code>0.29 * 100</code></p>
+    <p class="small">Floating point cannot store most decimal amounts exactly, so a floor credits ${Math.floor(float)} points for a 29-point offer. A reversal recomputed the same way can take back a different number than was credited.</p>`;
+  $('why-int').innerHTML = `
+    <p class="cmp-v">${show(demo)}</p>
+    <p class="cmp-code"><code>pointsForPayout(parseUsd('0.29'), { rate: '100', userShareBps: 10000 })</code></p>
+    <p class="small">This kit holds money as integer micro-dollars (<code>parseUsd('0.29')</code> is <code>${show(parseUsd('0.29'))}</code>) and points as integer units, multiplies everything as one BigInt product and rounds once.</p>`;
+  if (fine === null) {
+    $('why-mine').textContent = '';
+    return;
   }
-  $('why').innerHTML = `
-    <div class="cols"><p>Floating point cannot store most decimal amounts exactly. In JavaScript <code>0.29 * 100</code> is <code>${float}</code>, so a floor credits ${Math.floor(float)} points for a 29-point offer. A reversal recomputed the same way can take back a different number than was credited.</p>
-    <p>This kit holds money as integer micro-dollars (<code>parseUsd('0.29')</code> is <code>${show(parseUsd('0.29'))}</code>) and points as integer units, multiplies everything as one BigInt product and rounds once: <code>pointsForPayout</code> returns <code>${show(demo)}</code> for that offer.</p></div>
-    ${mine}`;
+  const f = parseFloat(v.payout) * parseFloat(v.rate) * (parseFloat(v.share) / 100) * (1 + bonusBps / 10000);
+  $('why-mine').innerHTML = `Your inputs as one floating point expression: <code>${esc(String(f))}</code>. Exact, from the library: <code>${group(formatUnits(fine, 6))}</code>.`;
 }
 
-const TICK = '<svg class="tick" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+const TICK = '<svg class="ic tick" aria-hidden="true" focusable="false"><use href="#i-check"/></svg>';
 
 function markPreset(i) {
   for (const b of $('presets').querySelectorAll('button')) b.setAttribute('aria-pressed', String(b.dataset.i === String(i)));
@@ -293,4 +311,4 @@ $('form').addEventListener('submit', (ev) => ev.preventDefault());
 
 fill(BASE);
 $('hint').textContent = PRESETS[0].hint;
-compute();
+compute(PRESETS[0].label);
