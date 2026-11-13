@@ -3,6 +3,7 @@ import {
   formatUsd,
   parseUnits,
   formatUnits,
+  divRound,
   defineCurrency,
   pointsForPayout,
   pointsToUsd,
@@ -117,7 +118,7 @@ function compute() {
   let currency;
   let config;
   let bonusBps = 0;
-  let bonusText = 'No bonus window';
+  let bonusText = 'None';
   let credited;
   try {
     payout = call(`parseUsd(${show(v.payout)})`, () => parseUsd(v.payout));
@@ -135,13 +136,14 @@ function compute() {
       const at = DAY0 + 86400 + secs(v.at);
       bonusBps = call(`activeBonusBps(${show(windows)}, ${at})`, () => activeBonusBps(windows, at));
       bonusText = bonusBps > 0
-        ? `+${formatUnits(bonusBps, 2)}% bonus, active at ${v.at} UTC`
-        : `Bonus window ${v.from} to ${v.to} UTC is not active at ${v.at}, no bonus`;
+        ? `+${formatUnits(bonusBps, 2)}%, active at ${v.at} UTC`
+        : `None, the ${v.from} to ${v.to} UTC window is not active at ${v.at}`;
     }
     credited = call(`pointsForPayout(${show(payout)}, currency, { bonusBps: ${bonusBps} })`, () => pointsForPayout(payout, currency, { bonusBps }));
   } catch (e) {
-    $('credit').innerHTML = err(e);
-    for (const id of ['rev', 'cash', 'infl']) $(id).innerHTML = '<p class="muted">Fix the inputs above to see this.</p>';
+    $('receipt-tag').innerHTML = '<span class="tag bad">input error</span>';
+    $('receipt').innerHTML = `${err(e)}<p class="small muted fix">Correct the input to see the result. The message above comes from the library.</p>`;
+    for (const id of ['credit', 'rev', 'cash', 'infl']) $(id).innerHTML = '<p class="muted">Waiting for valid inputs.</p>';
     renderWhy(v, null, 0);
     $('calls').textContent = calls.join('\n\n');
     return;
@@ -153,13 +155,38 @@ function compute() {
   }).join('');
   const fine = call(`pointsForPayout(${show(payout)}, { ...config, decimals: 6, rounding: "floor" }, { bonusBps: ${bonusBps} })`, () => pointsForPayout(payout, { ...config, decimals: 6, rounding: 'floor' }, { bonusBps }));
   const value = call(`pointsToUsd(${show(credited)}, currency)`, () => pointsToUsd(credited, currency));
+  let over = false;
+  let split = '<p class="small muted">A payout of $0.00 leaves nothing to split.</p>';
+  if (payout > 0n) {
+    const userBps = call(`divRound(${show(value)} * 10000n, ${show(payout)})`, () => divRound(value * 10000n, payout));
+    over = value > payout;
+    const rest = over ? value - payout : payout - value;
+    const keep = over ? `You add <b>${usd(rest)}</b> of your own` : `You keep <b>${usd(rest)}</b> (${formatUnits(10000n - userBps, 2)}%)`;
+    split = `
+      <div class="split${over ? ' over' : ''}" aria-hidden="true"><span class="split-user" data-w="${over ? 100 : Number(userBps) / 100}"></span><span class="split-keep"></span></div>
+      <ul class="split-key">
+        <li><span class="sw sw-user" aria-hidden="true"></span><span>Users get <b>${usd(value)}</b> (${formatUnits(userBps, 2)}%)</span></li>
+        <li>${over ? '' : '<span class="sw sw-keep" aria-hidden="true"></span>'}<span>${keep}</span></li>
+      </ul>`;
+  }
+  $('receipt-tag').innerHTML = over ? '<span class="tag bad">exceeds revenue</span>' : '';
+  $('receipt').innerHTML = `
+    <p class="big total"><b>${pts(credited)}</b> <span>${word(credited)} credited</span></p>
+    <p class="worth">Worth <b>${usd(value)}</b> at cash-out.</p>
+    <dl class="facts slip">
+      ${row('Offer payout', usd(payout))}
+      ${row('User share', `${formatUnits(currency.userShareBps, 2)}%`)}
+      ${row('Bonus', esc(bonusText))}
+    </dl>
+    <h4>Split of this ${usd(payout)} payout</h4>
+    ${split}`;
+  for (const el of $('receipt').querySelectorAll('[data-w]')) el.style.width = `${el.dataset.w}%`;
+
   $('credit').innerHTML = `
-    <p class="big"><b>${pts(credited)}</b> <span>${word(credited)}</span></p>
     <dl class="facts">
       ${row('Formula', `${esc(v.payout)} x ${esc(currency.rate)} x ${formatUnits(currency.userShareBps, 2)}% x ${formatUnits(10000 + bonusBps, 2)}%`)}
-      ${row('Bonus', esc(bonusText))}
       ${row('Before rounding (6 decimals)', `<span class="mono">${group(formatUnits(fine, 6))}</span>`)}
-      ${row('Face value at cash-out', usd(value))}
+      ${row(`Credited, ${esc(currency.rounding)}`, `<b>${pts(credited)}</b> ${word(credited)}`)}
     </dl>
     <p class="small muted">The same credit in each rounding mode:</p>
     <ul class="modes">${modes}</ul>`;
@@ -236,22 +263,30 @@ function renderWhy(v, fine, bonusBps) {
     mine = `<p class="small">Your inputs as one floating point expression: <code>${esc(String(f))}</code>. Exact, from the library: <code>${group(formatUnits(fine, 6))}</code>.</p>`;
   }
   $('why').innerHTML = `
-    <p>Floating point cannot store most decimal amounts exactly. In JavaScript <code>0.29 * 100</code> is <code>${float}</code>, so a floor credits ${Math.floor(float)} points for a 29-point offer. A reversal recomputed the same way can take back a different number than was credited.</p>
-    <p>This kit holds money as integer micro-dollars (<code>parseUsd('0.29')</code> is <code>${show(parseUsd('0.29'))}</code>) and points as integer units, multiplies everything as one BigInt product and rounds once: <code>pointsForPayout</code> returns <code>${show(demo)}</code> for that offer.</p>
+    <div class="cols"><p>Floating point cannot store most decimal amounts exactly. In JavaScript <code>0.29 * 100</code> is <code>${float}</code>, so a floor credits ${Math.floor(float)} points for a 29-point offer. A reversal recomputed the same way can take back a different number than was credited.</p>
+    <p>This kit holds money as integer micro-dollars (<code>parseUsd('0.29')</code> is <code>${show(parseUsd('0.29'))}</code>) and points as integer units, multiplies everything as one BigInt product and rounds once: <code>pointsForPayout</code> returns <code>${show(demo)}</code> for that offer.</p></div>
     ${mine}`;
 }
 
-$('presets').innerHTML = PRESETS.map((p, i) => `<button class="btn" type="button" data-i="${i}">${esc(p.label)}</button>`).join('');
+const TICK = '<svg class="tick" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+
+function markPreset(i) {
+  for (const b of $('presets').querySelectorAll('button')) b.setAttribute('aria-pressed', String(b.dataset.i === String(i)));
+}
+
+$('presets').innerHTML = PRESETS.map((p, i) => `<button class="btn" type="button" data-i="${i}" aria-pressed="${i === 0}">${TICK}${esc(p.label)}</button>`).join('');
 $('presets').addEventListener('click', (ev) => {
   const b = ev.target.closest('button[data-i]');
   if (!b) return;
   const p = PRESETS[Number(b.dataset.i)];
   fill({ ...BASE, ...p.set });
   $('hint').textContent = p.hint;
+  markPreset(b.dataset.i);
   compute();
 });
 $('form').addEventListener('input', () => {
-  $('hint').textContent = '';
+  $('hint').textContent = 'Custom inputs. Pick an example to reset them.';
+  markPreset(-1);
   compute();
 });
 $('form').addEventListener('submit', (ev) => ev.preventDefault());
