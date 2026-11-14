@@ -42,7 +42,7 @@ Each credit loses up to one unit to rounding (floor) or moves by up to half a un
 | 10000, payout $0.019 | 95 | 95 | 0% |
 
 ```js
-import { defineCurrency, pointsForPayout, parseUsd } from 'reward-economy-kit';
+import { defineCurrency, pointsForPayout, parseUsd } from '@moonetix/reward-economy-kit';
 
 const coins = defineCurrency({ rate: '1000', userShareBps: 5000 });
 pointsForPayout(parseUsd('0.019'), coins); // 9n
@@ -102,7 +102,7 @@ pointsForPayout(parseUsd('0.666'), c);      // 33n, one credit of 33.3
 A bonus multiplies the reward for credits that happen while it runs. It is paid from your share: your revenue does not change, users get more points for it.
 
 ```js
-import { activeBonusBps } from 'reward-economy-kit';
+import { activeBonusBps } from '@moonetix/reward-economy-kit';
 
 const windows = [
   // Every day from 18:00 to 20:00 UTC, starting 2026-01-01.
@@ -180,7 +180,7 @@ If your offerwall is on Moonetix, the reward in every postback is already in you
 The preset is useful for previews, tests, and your own offer lists built from the [Offers API](https://docs.moonetix.com/offers-api):
 
 ```js
-import { moonetixCurrency, moonetixBonusBps, pointsForPayout, parseUsd, formatUnits } from 'reward-economy-kit';
+import { moonetixCurrency, moonetixBonusBps, pointsForPayout, parseUsd, formatUnits } from '@moonetix/reward-economy-kit';
 
 const c = moonetixCurrency({ rate: '1000', splitPercent: 50, rounding: 'whole' });
 pointsForPayout(parseUsd('0.50'), c, { bonusBps: moonetixBonusBps('10') }); // 275n

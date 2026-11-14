@@ -4,6 +4,8 @@
 
 [![Live demo](https://img.shields.io/badge/live%20demo-calculator-0e7a48)](https://moonetix.github.io/reward-economy-kit/)
 [![CI](https://github.com/moonetix/reward-economy-kit/actions/workflows/ci.yml/badge.svg)](https://github.com/moonetix/reward-economy-kit/actions/workflows/ci.yml)
+[![npm](https://img.shields.io/npm/v/%40moonetix%2Freward-economy-kit?color=004ABB)](https://www.npmjs.com/package/@moonetix/reward-economy-kit)
+[![Packagist](https://img.shields.io/packagist/v/moonetix/reward-economy-kit?color=004ABB)](https://packagist.org/packages/moonetix/reward-economy-kit)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 [![Rewards docs](https://img.shields.io/badge/docs-rewards%20and%20currency-004ABB)](https://docs.moonetix.com/rewards)
 [![Zero dependencies](https://img.shields.io/badge/dependencies-zero-brightgreen)](package.json)
@@ -20,12 +22,12 @@ Rewards apps, offerwalls and game economies all turn a dollar payout into points
 
 ## Quick start
 
-The package is not on npm or Packagist yet; install it from Git.
+The JavaScript package is on [npm](https://www.npmjs.com/package/@moonetix/reward-economy-kit) and the PHP package is on [Packagist](https://packagist.org/packages/moonetix/reward-economy-kit).
 
-**JavaScript** (`npm install github:moonetix/reward-economy-kit`)
+**JavaScript** (`npm install @moonetix/reward-economy-kit`)
 
 ```js
-import { defineCurrency, parseUsd, pointsForPayout, applyReversal, inflationCheck, formatUnits } from 'reward-economy-kit';
+import { defineCurrency, parseUsd, pointsForPayout, applyReversal, inflationCheck, formatUnits } from '@moonetix/reward-economy-kit';
 
 const coins = defineCurrency({ rate: '1000', userShareBps: 6000 });   // 1000 coins per $1, 60% to users
 
@@ -41,8 +43,7 @@ inflationCheck(coins, { bonusBps: 1000 }).effectiveUserShareBps;            // 6
 **PHP**
 
 ```bash
-composer config repositories.rek vcs https://github.com/moonetix/reward-economy-kit
-composer require moonetix/reward-economy-kit:^1.0
+composer require moonetix/reward-economy-kit
 ```
 
 ```php

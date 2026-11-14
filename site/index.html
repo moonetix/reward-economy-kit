@@ -285,11 +285,11 @@
       <div role="tabpanel" id="panel-js" aria-labelledby="tab-js">
         <div class="snip">
           <div class="snip-top"><span>Install (Node 20+)</span><button class="btn copy" type="button" data-copy="js-install" data-name="JavaScript install command">Copy</button></div>
-          <pre class="code" id="js-install" tabindex="0" role="region" aria-label="JavaScript install command">npm install github:moonetix/reward-economy-kit</pre>
+          <pre class="code" id="js-install" tabindex="0" role="region" aria-label="JavaScript install command">npm install @moonetix/reward-economy-kit</pre>
         </div>
         <div class="snip">
           <div class="snip-top"><span>Credit, reverse, check</span><button class="btn copy" type="button" data-copy="js-use" data-name="JavaScript example">Copy</button></div>
-          <pre class="code" id="js-use" tabindex="0" role="region" aria-label="JavaScript example">import { defineCurrency, parseUsd, pointsForPayout, applyReversal, inflationCheck, formatUnits } from 'reward-economy-kit';
+          <pre class="code" id="js-use" tabindex="0" role="region" aria-label="JavaScript example">import { defineCurrency, parseUsd, pointsForPayout, applyReversal, inflationCheck, formatUnits } from '@moonetix/reward-economy-kit';
 
 const coins = defineCurrency({ rate: '1000', userShareBps: 6000 });   // 1000 coins per $1, 60% to users
 
@@ -304,9 +304,8 @@ inflationCheck(coins, { bonusBps: 1000 }).effectiveUserShareBps;            // 6
       </div>
       <div role="tabpanel" id="panel-php" aria-labelledby="tab-php" hidden>
         <div class="snip">
-          <div class="snip-top"><span>Install (PHP 8.1+)</span><button class="btn copy" type="button" data-copy="php-install" data-name="PHP install commands">Copy</button></div>
-          <pre class="code" id="php-install" tabindex="0" role="region" aria-label="PHP install commands">composer config repositories.rek vcs https://github.com/moonetix/reward-economy-kit
-composer require moonetix/reward-economy-kit:^1.0</pre>
+          <div class="snip-top"><span>Install (PHP 8.1+)</span><button class="btn copy" type="button" data-copy="php-install" data-name="PHP install command">Copy</button></div>
+          <pre class="code" id="php-install" tabindex="0" role="region" aria-label="PHP install command">composer require moonetix/reward-economy-kit</pre>
         </div>
         <div class="snip">
           <div class="snip-top"><span>Credit and reverse</span><button class="btn copy" type="button" data-copy="php-use" data-name="PHP example">Copy</button></div>

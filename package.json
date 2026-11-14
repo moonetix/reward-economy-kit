@@ -1,6 +1,6 @@
 {
-  "name": "reward-economy-kit",
-  "version": "1.0.0",
+  "name": "@moonetix/reward-economy-kit",
+  "version": "1.1.0",
   "description": "Integer-only math for rewards currencies: payout to points, rounding, bonuses, reversals, cash-out and an inflation check.",
   "type": "module",
   "main": "./src/index.js",
@@ -36,5 +36,6 @@
     "url": "git+https://github.com/moonetix/reward-economy-kit.git"
   },
   "license": "MIT",
+  "publishConfig": { "access": "public" },
   "author": "Moonetix (https://moonetix.com)"
 }
